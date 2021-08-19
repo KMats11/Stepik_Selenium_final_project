@@ -17,7 +17,6 @@ class ProductPage(BasePage):
         assert added_name == product_name, 'wrong name of added product'
 
     def should_be_right_total_basket_price(self):
-        # реализуйте проверку, что Стоимость корзины совпадает с ценой товара.
         basket_total_price = self.browser.find_element(*ProductPageLocators.BASKET_TOTAL_PRICE).text
         product_price = self.browser.find_element(*ProductPageLocators.PRODUCT_PRICE).text
         assert basket_total_price == product_price, 'wrong basket total price'
