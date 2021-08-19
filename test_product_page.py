@@ -2,8 +2,34 @@ import time
 import pytest
 from .pages.basket_page import BasketPage
 from .pages.locators import ProductPageLocators
+from .pages.locators import LoginPageLocators
 from .pages.product_page import ProductPage
 from .pages.login_page import LoginPage
+
+
+@pytest.mark.user
+class TestUserAddToBasketFromProductPage():
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self, browser):
+        self.login_page = LoginPage(browser, LoginPageLocators.LOGIN_URL)
+        self.login_page.open()
+        email = str(time.time()) + "@fakemail.org"
+        password = "123QWEqwe+"
+        self.login_page.register_new_user(email, password)
+        self.login_page.should_be_authorized_user()
+
+    def test_user_cant_see_success_message(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"  # страница без капчи с рассчётом
+        page = ProductPage(browser, link)
+        page.open()
+        page.is_not_element_present(*ProductPageLocators.SUCCESS_MESSAGE)
+
+    def test_user_can_add_product_to_basket(self, browser):
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"  # страница без капчи с рассчётом
+        page = ProductPage(browser, link)
+        page.open()
+        page.add_product_to_basket()
+        page.should_be_basket_added_messages()
 
 
 def test_guest_can_add_product_to_basket(browser):
@@ -31,7 +57,7 @@ def test_guest_cant_see_success_message(browser):
     page.open()
     page.is_not_element_present(*ProductPageLocators.SUCCESS_MESSAGE)
 
-
+@pytest.mark.disappear
 def test_message_disappeared_after_adding_product_to_basket(browser):
     link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
     page = ProductPage(browser, link)
